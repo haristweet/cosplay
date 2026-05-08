@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COSTUME FUSION — Photo × Illustration Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Archivo+Black&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0f0f0f;
+  --paper: #f7f4ee;
+  --accent: #ff3c00;
+  --accent2: #0047ff;
+  --muted: #9a9488;
+  --border: #d8d4cc;
+  --card: #ffffff;
+  --code-bg: #f0ede5;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'DM Mono', monospace;
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
+header {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 2.5rem 2rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+header::after {
+  content: 'A+B→';
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Archivo Black', sans-serif;
+  font-size: clamp(4rem, 15vw, 9rem);
+  color: rgba(247,244,238,0.04);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.header-tag {
+  display: inline-block;
+  border: 1px solid rgba(247,244,238,0.25);
+  color: rgba(247,244,238,0.5);
+  font-size: 0.65rem;
+  letter-spacing: 4px;
+  padding: 2px 10px;
+  margin-bottom: 0.75rem;
+  font-family: 'DM Mono', monospace;
+}
+
+h1 {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: clamp(2rem, 7vw, 4.5rem);
+  line-height: 0.95;
+  letter-spacing: -1px;
+}
+
+h1 em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+.header-sub {
+  margin-top: 0.6rem;
+  font-size: 0.78rem;
+  color: rgba(247,244,238,0.45);
+  letter-spacing: 1px;
+}
+
+/* ── FLOW DIAGRAM ── */
+.flow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.2rem 2rem;
+  background: var(--accent);
+  color: white;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  overflow-x: auto;
+}
+
+.flow-step {
+  white-space: nowrap;
+  padding: 3px 10px;
+  border: 1.5px solid rgba(255,255,255,0.5);
+}
+
+.flow-arrow { opacity: 0.7; flex-shrink: 0; }
+
+/* ── MAIN ── */
+main {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* ── SECTION ── */
+.sec-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  margin-top: 2.5rem;
+}
+
+.sec-num {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 2.5rem;
+  color: var(--border);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.sec-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.sec-desc {
+  font-size: 0.75rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-top: 0.2rem;
+}
+
+/* ── UPLOAD ZONE ── */
+.upload-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 540px) { .upload-pair { grid-template-columns: 1fr; } }
+
+.upload-zone {
+  border: 2px dashed var(--border);
+  background: var(--card);
+  padding: 1.5rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.upload-zone:hover { border-color: var(--accent); background: #fff8f6; }
+.upload-zone.has-file { border-color: var(--accent2); border-style: solid; }
+
+.upload-zone input[type=file] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+.upload-label {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1.4rem;
+  color: var(--border);
+}
+
+.upload-zone.has-file .upload-label { color: var(--accent2); }
+
+.upload-hint {
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+.upload-preview {
+  max-width: 100%;
+  max-height: 120px;
+  object-fit: contain;
+  display: none;
+}
+
+.upload-zone.has-file .upload-preview { display: block; }
+.upload-zone.has-file .upload-icon { display: none; }
+
+.upload-icon { font-size: 2rem; opacity: 0.3; }
+
+/* ── FIELDS ── */
+.field { margin-bottom: 1rem; }
+
+label {
+  display: block;
+  font-size: 0.68rem;
+  letter-spacing: 3px;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+}
+
+input[type=text], select, textarea {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.88rem;
+  padding: 0.6rem 0.85rem;
+  outline: none;
+  transition: border-color 0.2s;
+  border-radius: 0;
+  appearance: none;
+}
+
+input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23ff3c00' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.8rem center;
+  padding-right: 2rem;
+  cursor: pointer;
+}
+
+textarea { resize: vertical; min-height: 72px; line-height: 1.6; }
+
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 540px) { .field-row { grid-template-columns: 1fr; } }
+
+/* ── CHIPS ── */
+.chip-group { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.35rem; }
+
+.chip {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  padding: 3px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.chip:hover { border-color: var(--accent); color: var(--accent); }
+.chip.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+/* ── SLIDER ── */
+.slider-row { display: flex; align-items: center; gap: 0.75rem; }
+input[type=range] {
+  flex: 1;
+  accent-color: var(--accent);
+  height: 3px;
+  cursor: pointer;
+}
+.slider-val {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1rem;
+  color: var(--accent);
+  min-width: 2rem;
+  text-align: right;
+}
+
+/* ── GENERATE ── */
+.btn-gen {
+  width: 100%;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1.6rem;
+  letter-spacing: 3px;
+  padding: 1.1rem;
+  cursor: pointer;
+  margin-top: 2rem;
+  transition: all 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-gen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s;
+}
+
+.btn-gen:hover::before { transform: scaleX(1); }
+.btn-gen span { position: relative; z-index: 1; }
+.btn-gen:active { transform: scale(0.99); }
+
+/* ── OUTPUT ── */
+.output { margin-top: 2.5rem; display: none; }
+.output.show { display: block; }
+
+.out-tabs { display: flex; border-bottom: 2px solid var(--ink); }
+
+.tab {
+  background: transparent;
+  border: none;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  color: var(--muted);
+  padding: 0.6rem 1.4rem;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.15s;
+}
+
+.tab.on { color: var(--ink); border-bottom-color: var(--accent); }
+
+.tab-panel { display: none; }
+.tab-panel.on { display: block; }
+
+.out-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+}
+
+.out-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 3px;
+  color: var(--muted);
+}
+
+.copy-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  padding: 3px 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem;
+  line-height: 1.8;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #444;
+}
+
+.k { color: var(--accent2); font-weight: 500; }
+.s { color: #1a7a1a; }
+.n { color: var(--accent); }
+
+.prompt-out {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent2);
+  padding: 1.5rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.82rem;
+  line-height: 1.9;
+  color: var(--ink);
+  white-space: pre-wrap;
+}
+
+/* ── TIPS ── */
+.tips {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  padding: 1.4rem 1.6rem;
+  font-size: 0.8rem;
+  line-height: 2.1;
+  color: #555;
+  margin-top: 0.5rem;
+}
+
+.tips strong { color: var(--ink); font-weight: 500; }
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">PROMPT SYSTEM v1.0</div>
+  <h1>COSTUME<br><em>FUSION</em></h1>
+  <div class="header-sub">Photo A × Illustration B → AI Costume Swap JSON</div>
+</header>
+
+<div class="flow">
+  <div class="flow-step">A: 写真</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">ポーズ・構図をキープ</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">B: コスチューム適用</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">JSON出力</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">AI生成</div>
+</div>
+
+<main>
+
+  <!-- 01: PHOTO A -->
+  <div class="sec-head">
+    <div class="sec-num">01</div>
+    <div>
+      <div class="sec-title">PHOTO A — 元の写真</div>
+      <div class="sec-desc">ポーズ・構図・背景の参照元。この人物の外見・体型・表情が基準になります。</div>
+    </div>
+  </div>
+
+  <div class="upload-pair">
+    <div class="upload-zone" id="zoneA">
+      <input type="file" accept="image/*" onchange="previewImg(this,'zoneA','previewA','labelA')">
+      <div class="upload-icon">📷</div>
+      <div class="upload-label" id="labelA">A</div>
+      <div class="upload-hint">TAP TO UPLOAD</div>
+      <img id="previewA" class="upload-preview" src="" alt="">
+    </div>
+    <div style="display:flex;flex-direction:column;justify-content:center;gap:0.75rem">
+      <div class="field">
+        <label>人物の説明</label>
+        <input type="text" id="personDesc" placeholder="例：20代女性、笑顔、右向き45度、全身ショット">
+      </div>
+      <div class="field">
+        <label>ポーズ・構図</label>
+        <input type="text" id="poseDesc" placeholder="例：両手を腰に、カメラ目線、正面立ち">
+      </div>
+      <div class="field">
+        <label>背景の扱い</label>
+        <select id="bgTreatment">
+          <option value="keep the original background exactly as-is">背景もそのまま保持</option>
+          <option value="keep the background but make it slightly blurred">背景をぼかす</option>
+          <option value="replace background with a simple solid color matching the costume palette">コスチュームに合う単色に変更</option>
+          <option value="replace background with a pop illustration style background">ポップなイラスト背景に変更</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 02: ILLUSTRATION B -->
+  <div class="sec-head">
+    <div class="sec-num">02</div>
+    <div>
+      <div class="sec-title">ILLUSTRATION B — コスチューム参照</div>
+      <div class="sec-desc">着せたいコスチューム・スタイルの参照画像。色・デザイン・テクスチャの基準。</div>
+    </div>
+  </div>
+
+  <div class="upload-pair">
+    <div class="upload-zone" id="zoneB">
+      <input type="file" accept="image/*" onchange="previewImg(this,'zoneB','previewB','labelB')">
+      <div class="upload-icon">🎨</div>
+      <div class="upload-label" id="labelB">B</div>
+      <div class="upload-hint">TAP TO UPLOAD</div>
+      <img id="previewB" class="upload-preview" src="" alt="">
+    </div>
+    <div style="display:flex;flex-direction:column;justify-content:center;gap:0.75rem">
+      <div class="field">
+        <label>コスチュームの説明</label>
+        <input type="text" id="costumeDesc" placeholder="例：ティールのもふもふ熊耳フード付きスーツ、桜の刺繍入り">
+      </div>
+      <div class="field">
+        <label>コスチュームのスタイル</label>
+        <select id="costumeStyle">
+          <option value="illustrated / cartoon style">イラスト・カートゥーン調</option>
+          <option value="realistic 3D rendered">リアル3Dレンダリング調</option>
+          <option value="anime style">アニメ調</option>
+          <option value="flat 2D illustration">フラット2Dイラスト</option>
+          <option value="photorealistic fabric">リアルな写真質感</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>メインカラー（コスチューム）</label>
+        <input type="text" id="costumeColor" placeholder="例：ティールグリーン、ピンクの桜模様、ゴールドの刺繍">
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 03: FUSION SETTINGS -->
+  <div class="sec-head">
+    <div class="sec-num">03</div>
+    <div>
+      <div class="sec-title">FUSION SETTINGS — 合成パラメーター</div>
+      <div class="sec-desc">どこまでBのコスチュームを適用するか、スタイルの強度を設定。</div>
+    </div>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <label>適用範囲</label>
+      <div class="chip-group" id="applyScope">
+        <button class="chip on" data-val="full body outfit">全身アウトフィット</button>
+        <button class="chip" data-val="top only">上半身のみ</button>
+        <button class="chip" data-val="head and hood only">頭部・フードのみ</button>
+        <button class="chip" data-val="outfit and accessories">服＋アクセサリー全て</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>顔の扱い</label>
+      <div class="chip-group" id="faceMode">
+        <button class="chip on" data-val="keep the person's real face from Photo A exactly">Aの顔をそのまま保持</button>
+        <button class="chip" data-val="stylize the face to match the illustration style of B">Bのイラストスタイルに合わせる</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <label>コスチューム適用強度</label>
+      <div class="slider-row">
+        <span style="font-size:0.7rem;color:var(--muted)">弱</span>
+        <input type="range" id="strength" min="1" max="10" value="8" oninput="document.getElementById('strengthVal').textContent=this.value">
+        <span style="font-size:0.7rem;color:var(--muted)">強</span>
+        <div class="slider-val" id="strengthVal">8</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>出力スタイルミックス</label>
+      <select id="outputMix">
+        <option value="photorealistic person wearing illustrated costume">リアル人物 × イラストコスチューム</option>
+        <option value="both person and costume in illustration style">全体イラスト化</option>
+        <option value="photorealistic composite — both elements look real">全体をリアルに合成</option>
+        <option value="3D render style for both">全体3Dレンダリング</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>追加指示・特記事項</label>
+    <textarea id="extraNote" placeholder="例：体型はAの写真通りに保つ / 靴はそのまま / 背景に桜の木を追加 など"></textarea>
+  </div>
+
+  <button class="btn-gen" onclick="generate()">
+    <span>→ GENERATE JSON + PROMPT</span>
+  </button>
+
+  <!-- OUTPUT -->
+  <div class="output" id="output">
+    <div class="out-tabs">
+      <button class="tab on" onclick="switchTab('json')">JSON</button>
+      <button class="tab" onclick="switchTab('prompt')">AI PROMPT</button>
+      <button class="tab" onclick="switchTab('tips')">TOOL TIPS</button>
+    </div>
+
+    <div class="tab-panel on" id="tab-json">
+      <div class="out-header">
+        <span class="out-title">COSTUME FUSION JSON</span>
+        <button class="copy-btn" onclick="copyEl('jsonOut')">COPY</button>
+      </div>
+      <pre id="jsonOut"></pre>
+    </div>
+
+    <div class="tab-panel" id="tab-prompt">
+      <div class="out-header">
+        <span class="out-title">AI IMAGE PROMPT</span>
+        <button class="copy-btn" onclick="copyEl('promptOut')">COPY</button>
+      </div>
+      <div class="prompt-out" id="promptOut"></div>
+    </div>
+
+    <div class="tab-panel" id="tab-tips">
+      <div class="out-header">
+        <span class="out-title">RECOMMENDED TOOLS & TIPS</span>
+      </div>
+      <div class="tips" id="tipsOut"></div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+function previewImg(input, zoneId, previewId, labelId) {
+  const file = input.files[0];
+  if (!file) return;
+  const zone = document.getElementById(zoneId);
+  const preview = document.getElementById(previewId);
+  const label = document.getElementById(labelId);
+  const reader = new FileReader();
+  reader.onload = e => {
+    preview.src = e.target.result;
+    zone.classList.add('has-file');
+    label.textContent = file.name.substring(0, 12) + (file.name.length > 12 ? '…' : '');
+  };
+  reader.readAsDataURL(file);
+}
+
+// Single-select chip groups
+document.querySelectorAll('.chip-group').forEach(group => {
+  const chips = group.querySelectorAll('.chip');
+  const isMulti = group.id === 'sparkle'; // extend if needed
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      if (!isMulti) {
+        chips.forEach(c => c.classList.remove('on'));
+        chip.classList.add('on');
+      } else {
+        chip.classList.toggle('on');
+      }
+    });
+  });
+});
+
+function getChip(groupId) {
+  const el = document.querySelector(`#${groupId} .chip.on`);
+  return el ? el.dataset.val : '';
+}
+
+function v(id) { return document.getElementById(id).value.trim(); }
+
+function generate() {
+  const strengthNum = parseInt(document.getElementById('strength').value);
+  const strengthLabel = strengthNum <= 3 ? 'subtle (30%)' : strengthNum <= 6 ? 'moderate (60%)' : strengthNum <= 8 ? 'strong (80%)' : 'maximum (100%)';
+
+  const data = {
+    task: "costume_fusion",
+    source: {
+      photo_A: {
+        role: "pose and composition reference — DO NOT change",
+        person: v('personDesc') || "person in photo A",
+        pose: v('poseDesc') || "as shown in photo A",
+        background: v('bgTreatment')
+      },
+      illustration_B: {
+        role: "costume and style reference",
+        costume_description: v('costumeDesc') || "costume from illustration B",
+        costume_style: v('costumeStyle'),
+        main_colors: v('costumeColor') || "as shown in illustration B"
+      }
+    },
+    fusion_rules: {
+      apply_costume_to: getChip('applyScope') || 'full body outfit',
+      face_treatment: getChip('faceMode') || "keep the person's real face from Photo A exactly",
+      costume_strength: strengthLabel,
+      output_style: v('outputMix'),
+      pose_lock: "STRICT — body position, camera angle, framing must match Photo A exactly",
+      extra_instructions: v('extraNote') || "(none)"
+    },
+    constraints: [
+      "Do NOT change the person's body proportions or pose",
+      "Do NOT change the camera angle or composition",
+      "Apply ONLY the costume elements from illustration B",
+      `Face: ${getChip('faceMode') || "preserve from Photo A"}`
+    ]
+  };
+
+  // Render JSON with syntax highlighting
+  const jsonStr = JSON.stringify(data, null, 2)
+    .replace(/"([^"]+)":/g, '<span class="k">"$1"</span>:')
+    .replace(/: "([^"]+)"/g, ': <span class="s">"$1"</span>');
+  document.getElementById('jsonOut').innerHTML = jsonStr;
+
+  // Build prompt
+  const p = data.source.photo_A;
+  const b = data.source.illustration_B;
+  const f = data.fusion_rules;
+
+  const extraLine = v('extraNote') ? `\nADDITIONAL INSTRUCTIONS: ${v('extraNote')}` : '';
+
+  const prompt = `You have two reference images:
+— Image A: a photograph (pose + person reference)
+— Image B: an illustration (costume reference)
+
+TASK: Apply the costume from Image B onto the person in Image A.
+
+WHAT TO KEEP FROM IMAGE A (unchanged):
+• The person's exact pose and body position
+• Camera angle and framing / composition
+• ${p.background}
+${getChip('faceMode')?.includes('keep') ? '• The person\'s real face and facial expression' : ''}
+
+WHAT TO TAKE FROM IMAGE B (apply to person):
+• ${b.costume_description}
+• Costume style: ${b.costume_style}
+• Main colors: ${b.main_colors}
+• Apply to: ${f.apply_costume_to}
+• Costume fidelity: ${f.costume_strength}
+
+OUTPUT STYLE: ${f.output_style}
+
+STRICT RULES:
+— Do NOT alter the pose or body proportions from Image A
+— Do NOT change the camera angle
+— The costume must visually match Image B in color, shape, and detail
+— Blend the costume naturally onto the person's body${extraLine}`;
+
+  document.getElementById('promptOut').textContent = prompt;
+
+  // Tips
+  const faceKeep = getChip('faceMode')?.includes('keep');
+  document.getElementById('tipsOut').innerHTML = `
+<strong>おすすめツール（このJSONの用途別）</strong><br><br>
+<strong>★ベスト: Flux Kontext Max</strong> — fal.ai / Replicate<br>
+  2枚画像入力対応。「Image A = pose ref, Image B = style ref」を直接指定できる。<br>
+  実写顔保持が最も安定。<br><br>
+<strong>Qwen-VL Edit</strong> — HuggingFace / Qwen API<br>
+  イラスト→写真のコスチューム転写が得意。無料枠あり。<br><br>
+<strong>ComfyUI + IP-Adapter</strong> — ローカル実行<br>
+  最も細かい制御が可能。A=pose、B=styleを別ノードで制御。<br><br>
+${faceKeep ? '<strong>顔保持のコツ:</strong> プロンプト冒頭に「preserve the face identity from reference image A」を必ず入れる。<br><br>' : ''}
+<strong>Geminiで試す場合:</strong><br>
+  「Edit this image (A). Replace the clothing with the costume shown in the second reference image (B). Keep the pose, face, and background exactly the same.」<br>
+  → 2枚アップロードしてこの指示を使う。
+`;
+
+  document.getElementById('output').classList.add('show');
+  setTimeout(() => document.getElementById('output').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('on'));
+  document.querySelector(`[onclick="switchTab('${name}')"]`).classList.add('on');
+  document.getElementById(`tab-${name}`).classList.add('on');
+}
+
+function copyEl(id) {
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el.textContent).then(() => {
+    const btn = el.closest('.tab-panel').querySelector('.copy-btn') || el.parentElement.querySelector('.copy-btn');
+    const orig = btn.textContent;
+    btn.textContent = '✓ COPIED';
+    btn.style.color = 'var(--accent2)';
+    setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1500);
+  });
+}
+</script>
+
+</body>
+</html>
